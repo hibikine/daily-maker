@@ -10,7 +10,7 @@
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "deploy": "yarn build && gh-pages -d dist"
+    "deploy": "yarn build --public-url /daily-maker/ && gh-pages -d dist"
   },
   "dependencies": {
     "react": "^16.13.1",
