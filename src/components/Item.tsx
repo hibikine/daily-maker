@@ -1,21 +1,26 @@
 import * as React from 'react';
-export function Item({
-  setState,
-  length,
-  text,
-  showUp,
-  showDown,
-  onMove,
-}: {
-  setState(v: { text?: string; length?: number }): void;
-  length: number;
-  text: string;
-  onMove(v: number): void;
-  showUp: boolean;
-  showDown: boolean;
-}): React.ReactElement {
-  return (
-    <div>
+import styled from 'styled-components';
+export const Item = styled(
+  ({
+    className,
+    setState,
+    length,
+    text,
+    showUp,
+    showDown,
+    onMove,
+    onDelete,
+  }: {
+    className?: string;
+    setState(v: { text?: string; length?: number }): void;
+    length: number;
+    text: string;
+    onMove(v: number): void;
+    onDelete?(): void;
+    showUp: boolean;
+    showDown: boolean;
+  }): React.ReactElement => (
+    <div className={className}>
       <input
         type="number"
         value={length}
@@ -38,6 +43,23 @@ export function Item({
           Down
         </button>
       )}
+      {onDelete && (
+        <button type="button" onClick={onDelete}>
+          Delete
+        </button>
+      )}
     </div>
-  );
-}
+  )
+)`
+  display: flex;
+
+  & > input:first-child {
+    margin-right: 12px;
+  }
+  & > input:nth-child(2) {
+    flex-grow: 1;
+  }
+  & > button {
+    margin-left: 4px;
+  }
+`;
