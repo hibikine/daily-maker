@@ -31691,15 +31691,16 @@ var __importStar = this && this.__importStar || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Schedule = void 0;
+exports.zeroFill = exports.Schedule = void 0;
 
 var React = __importStar(require("react"));
 
 function Schedule(_a) {
-  var schedules = _a.schedules;
+  var schedules = _a.schedules,
+      initialTime = _a.initialTime;
   return React.createElement("textarea", {
     readOnly: true,
-    value: genSchedule(schedules),
+    value: genSchedule(schedules, initialTime),
     rows: 10,
     cols: 100
   });
@@ -31707,8 +31708,18 @@ function Schedule(_a) {
 
 exports.Schedule = Schedule;
 
-function genSchedule(schedules) {
+function genSchedule(schedules, initialTime) {
   var time = new Date();
+
+  if (typeof initialTime === 'string') {
+    var now_split = initialTime.split(':');
+
+    if (now_split.length > 1) {
+      time.setHours(parseInt(now_split[0], 10));
+      time.setMinutes(parseInt(now_split[1], 10));
+    }
+  }
+
   return getTodayDateAsStr(time) + "\n" + schedules.map(function (_a) {
     var text = _a.text,
         length = _a.length;
@@ -31721,6 +31732,8 @@ function genSchedule(schedules) {
 function zeroFill(s) {
   return s.padStart(2, '0');
 }
+
+exports.zeroFill = zeroFill;
 
 function getTodayDateAsStr(time) {
   return time.getFullYear() + "/" + zeroFill("" + time.getMonth()) + "/" + zeroFill("" + time.getDate()) + "(" + dayToStr(time.getDay()) + ")";
@@ -31738,6 +31751,62 @@ function dayToStr(day) {
   };
   return dayTable[day];
 }
+},{"react":"node_modules/react/index.js"}],"src/components/InitialTime.tsx":[function(require,module,exports) {
+"use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.InitialTime = void 0;
+
+var React = __importStar(require("react"));
+
+exports.InitialTime = function (_a) {
+  var time = _a.time,
+      setTime = _a.setTime;
+  return React.createElement("div", null, React.createElement("input", {
+    type: "time",
+    value: time,
+    onChange: function onChange(_a) {
+      var value = _a.target.value;
+      return setTime(value);
+    }
+  }));
+};
 },{"react":"node_modules/react/index.js"}],"src/components/Root.tsx":[function(require,module,exports) {
 "use strict";
 
@@ -31834,6 +31903,8 @@ var Item_1 = require("./Item");
 
 var Schedule_1 = require("./Schedule");
 
+var InitialTime_1 = require("./InitialTime");
+
 var styled_components_1 = __importStar(require("styled-components"));
 
 function genSchedule(k) {
@@ -31859,10 +31930,19 @@ exports.Root = styled_components_1.default(function (_a) {
       schedules = _b[0],
       setSchedules = _b[1];
 
-  console.log(schedules);
+  var _c = React.useState(function () {
+    var now = new Date();
+    return Schedule_1.zeroFill("" + now.getHours()) + ":" + Schedule_1.zeroFill("" + now.getMinutes());
+  }),
+      beginTime = _c[0],
+      setBeginTime = _c[1];
+
   return React.createElement("div", {
     className: className
-  }, React.createElement(GlobalStyle, null), React.createElement("div", null, schedules.map(function (v, i) {
+  }, React.createElement(GlobalStyle, null), React.createElement(InitialTime_1.InitialTime, {
+    time: beginTime,
+    setTime: setBeginTime
+  }), React.createElement("div", null, schedules.map(function (v, i) {
     return React.createElement(Item_1.Item, __assign({}, v, {
       setState: function setState(v) {
         return setSchedules(function (s) {
@@ -31896,12 +31976,13 @@ exports.Root = styled_components_1.default(function (_a) {
       });
     }
   }, "Add"), React.createElement(Schedule_1.Schedule, {
-    schedules: schedules
+    schedules: schedules,
+    initialTime: beginTime
   }));
 })(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  display: flex;\n  max-width: 800px;\n  flex-direction: column;\n  margin: 24px auto;\n\n  & > div:first-child {\n    margin-bottom: 12px;\n  }\n  & > div:first-child > div {\n    margin-bottom: 4px;\n  }\n  & > button {\n    height: 40px;\n    font-size: 1.5rem;\n    margin-bottom: 12px;\n  }\n"], ["\n  display: flex;\n  max-width: 800px;\n  flex-direction: column;\n  margin: 24px auto;\n\n  & > div:first-child {\n    margin-bottom: 12px;\n  }\n  & > div:first-child > div {\n    margin-bottom: 4px;\n  }\n  & > button {\n    height: 40px;\n    font-size: 1.5rem;\n    margin-bottom: 12px;\n  }\n"])));
 var GlobalStyle = styled_components_1.createGlobalStyle(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\nhtml,body {\n  margin: 0;\n  padding: 0;\n}\n"], ["\nhtml,body {\n  margin: 0;\n  padding: 0;\n}\n"])));
 var templateObject_1, templateObject_2;
-},{"react":"node_modules/react/index.js","./Item":"src/components/Item.tsx","./Schedule":"src/components/Schedule.tsx","styled-components":"node_modules/styled-components/dist/styled-components.browser.esm.js"}],"src/index.tsx":[function(require,module,exports) {
+},{"react":"node_modules/react/index.js","./Item":"src/components/Item.tsx","./Schedule":"src/components/Schedule.tsx","./InitialTime":"src/components/InitialTime.tsx","styled-components":"node_modules/styled-components/dist/styled-components.browser.esm.js"}],"src/index.tsx":[function(require,module,exports) {
 "use strict";
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -31977,7 +32058,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "32805" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33545" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
