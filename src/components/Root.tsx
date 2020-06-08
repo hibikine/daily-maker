@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Item } from './Item';
-import { Schedule } from './Schedule';
+import { zeroFill, Schedule } from './Schedule';
+import { InitialTime } from './InitialTime';
 import styled, { createGlobalStyle } from 'styled-components';
 
 function genSchedule(k: number) {
@@ -15,10 +16,16 @@ function swap<T>(arr: T[], from: number, to: number): T[] {
 export const Root = styled(
   ({ className }: { className?: string }): React.ReactElement => {
     const [schedules, setSchedules] = React.useState([genSchedule(0)]);
-    console.log(schedules);
+    const [beginTime, setBeginTime] = React.useState(() => {
+      const now = new Date();
+      return `${zeroFill(`${now.getHours()}`)}:${zeroFill(
+        `${now.getMinutes()}`
+      )}`;
+    });
     return (
       <div className={className}>
         <GlobalStyle />
+        <InitialTime time={beginTime} setTime={setBeginTime} />
         <div>
           {schedules.map((v, i) => (
             <Item
@@ -54,7 +61,7 @@ export const Root = styled(
         >
           Add
         </button>
-        <Schedule schedules={schedules} />
+        <Schedule schedules={schedules} initialTime={beginTime} />
       </div>
     );
   }
